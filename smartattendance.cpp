@@ -1,7 +1,6 @@
 #include <Adafruit_Fingerprint.h>
 #include <SoftwareSerial.h>
 
-// Fingerprint sensor connected to pins 2 (RX) and 3 (TX)
 SoftwareSerial mySerial(2, 3);
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
 
@@ -26,7 +25,6 @@ void setup() {
 
 void loop() {
 
-  // Check if user typed E in Serial Monitor
   if (Serial.available()) {
     char c = Serial.read();
     if (c == 'E' || c == 'e') {
@@ -34,24 +32,17 @@ void loop() {
     }
   }
 
-  // Try reading a finger
   int id = getFingerprintID();
   if (id > 0) {
     Serial.print("Attendance Marked: ");
     Serial.println(id);
 
-    // Simple CSV output
     Serial.print(id);
     Serial.print(",");
-    Serial.println("TIMESTAMP");   // You can replace this later with RTC timestamp
-
-    delay(1500);  // debounce delay
-  }
+    Serial.println("TIMESTAMP");   
+    delay(1500); 
 }
 
-// -----------------------------
-// ENROLLMENT FUNCTION
-// -----------------------------
 void enrollFinger() {
   int id;
   Serial.println("Enter ID number (1-127):");
@@ -62,7 +53,6 @@ void enrollFinger() {
 
   if (id == 0) return;
 
-  // Step 1
   Serial.println("Place finger...");
   while (finger.getImage() != FINGERPRINT_OK);
   finger.image2Tz(1);
@@ -70,7 +60,6 @@ void enrollFinger() {
   Serial.println("Remove finger...");
   delay(2000);
 
-  // Step 2
   Serial.println("Place same finger again...");
   while (finger.getImage() != FINGERPRINT_OK);
   finger.image2Tz(2);
@@ -86,13 +75,10 @@ void enrollFinger() {
   }
 }
 
-// -----------------------------
-// MATCH FINGERPRINT
-// -----------------------------
 int getFingerprintID() {
   if (finger.getImage() != FINGERPRINT_OK) return -1;
   if (finger.image2Tz() != FINGERPRINT_OK) return -1;
   if (finger.fingerFastSearch() != FINGERPRINT_OK) return -1;
 
-  return finger.fingerID;   // return matched ID
+  return finger.fingerID;  
 }
